@@ -99,24 +99,35 @@ public class ExtUtils
 			{
 				case FLEXO:
 					flexo.mouseMove(cp.getX(), cp.getY());
-					flexo.mousePressAndRelease(1);
+					try
+					{
+						Thread.sleep(getMillis());
+					}
+					catch (InterruptedException e)
+					{
+						e.printStackTrace();
+					}
+					leftClick(cp.getX(), cp.getY(), client, scalingfactor, false);
 					break;
 				case MOUSEEVENTS:
-					leftClick(cp.getX(), cp.getY(), client, scalingfactor);
+					leftClick(cp.getX(), cp.getY(), client, scalingfactor, true);
 					flexo.delay(delay);
 					break;
 			}
 		}
 	}
 
-	public static void leftClick(int x, int y, Client client, double scalingFactor)
+	public static void leftClick(int x, int y, Client client, double scalingFactor, boolean move)
 	{
 		if (client.isStretchedEnabled())
 		{
 			net.runelite.api.Point p = client.getMouseCanvasPosition();
-			if (p.getX() != x || p.getY() != y)
+			if (move)
 			{
-				moveMouse(x, y, client);
+				if (p.getX() != x || p.getY() != y)
+				{
+					moveMouse(x, y, client);
+				}
 			}
 			double scale = 1 + (scalingFactor / 100);
 
@@ -133,9 +144,12 @@ public class ExtUtils
 		if (!client.isStretchedEnabled())
 		{
 			net.runelite.api.Point p = client.getMouseCanvasPosition();
-			if (p.getX() != x || p.getY() != y)
+			if (move)
 			{
-				moveMouse(x, y, client);
+				if (p.getX() != x || p.getY() != y)
+				{
+					moveMouse(x, y, client);
+				}
 			}
 			MouseEvent mousePressed = new MouseEvent(client.getCanvas(), 501, System.currentTimeMillis(), 0, client.getMouseCanvasPosition().getX(), client.getMouseCanvasPosition().getY(), 1, false, 1);
 			client.getCanvas().dispatchEvent(mousePressed);
@@ -173,5 +187,11 @@ public class ExtUtils
 			int y = (int) (rect.getY() + (rand * 3) + rect.getHeight() / 2);
 			return new Point(x, y);
 		}
+	}
+
+	private static long getMillis()
+	{
+		// TODO: Read these from config
+		return (long) (Math.random() * 70 + 80);
 	}
 }

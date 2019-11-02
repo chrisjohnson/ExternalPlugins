@@ -174,11 +174,18 @@ public class PraySwap extends Plugin
 			{
 				case FLEXO:
 					flexo.mouseMove(cp.getX(), cp.getY());
-					flexo.mousePressAndRelease(1);
-					flexo.delay((int) getMillis());
+					try
+					{
+						Thread.sleep(getMillis());
+					}
+					catch (InterruptedException e)
+					{
+						e.printStackTrace();
+					}
+					leftClick(cp.getX(), cp.getY(), false);
 					break;
 				case MOUSEEVENTS:
-					leftClick(cp.getX(), cp.getY());
+					leftClick(cp.getX(), cp.getY(), true);
 					try
 					{
 						Thread.sleep(getMillis());
@@ -207,15 +214,18 @@ public class PraySwap extends Plugin
 		this.client.getCanvas().dispatchEvent(mouseMoved);
 	}
 
-	private void leftClick(int x, int y)
+	private void leftClick(int x, int y, boolean move)
 	{
 		if (client.isStretchedEnabled())
 		{
 			double scalingfactor = configManager.getConfig(StretchedModeConfig.class).scalingFactor();
 			Point p = this.client.getMouseCanvasPosition();
-			if (p.getX() != x || p.getY() != y)
+			if (move)
 			{
-				this.moveMouse(x, y);
+				if (p.getX() != x || p.getY() != y)
+				{
+					this.moveMouse(x, y);
+				}
 			}
 			double scale = 1 + (scalingfactor / 100);
 
@@ -232,9 +242,12 @@ public class PraySwap extends Plugin
 		else
 		{
 			Point p = this.client.getMouseCanvasPosition();
-			if (p.getX() != x || p.getY() != y)
+			if (move)
 			{
-				this.moveMouse(x, y);
+				if (p.getX() != x || p.getY() != y)
+				{
+					this.moveMouse(x, y);
+				}
 			}
 			MouseEvent mousePressed = new MouseEvent(this.client.getCanvas(), 501, System.currentTimeMillis(), 0, this.client.getMouseCanvasPosition().getX(), this.client.getMouseCanvasPosition().getY(), 1, false, 1);
 			this.client.getCanvas().dispatchEvent(mousePressed);
